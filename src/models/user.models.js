@@ -42,9 +42,14 @@ const userSchema = new mongoose.Schema(
     ],
     refreshToken: {
       type: String,
-      default:""
+      default: "",
+    },
+    personalPassword: {
+      type: String,
+      required: true,
     },
   },
+
   { timestamps: true }
 );
 
