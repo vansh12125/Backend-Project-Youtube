@@ -270,6 +270,65 @@ const forgotPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password updated successfully"));
 });
 
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+  if (!avatarLocalPath) throw new ApiError(404, "Avatar file was missing");
+
+  const avatarUrl = await uploadFile(avatarLocalPath);
+  if (!avatarUrl) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatarUrl,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password -refreshToken -personalPassword");
+
+  if (!user)
+    throw new ApiError(500, "Error while uploading avatar on database");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar updated successfully"));
+});
+
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+  if (!coverImageLocalPath)
+    throw new ApiError(404, "CoverImage file was missing");
+
+  const coverImageUrl = await uploadFile(coverImageLocalPath);
+  if (!coverImageUrl) {
+    throw new ApiError(400, "Error while uploading CoverImage");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: coverImageUrl,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password -refreshToken -personalPassword");
+
+  if (!user)
+    throw new ApiError(500, "Error while uploading CoverImage on database");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "CoverImage updated successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -278,4 +337,6 @@ export {
   updatePassword,
   getCurrentUser,
   forgotPassword,
+  updateAvatar,
+  updateCoverImage,
 };
