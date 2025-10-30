@@ -220,6 +220,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const updatePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
+  if (newPassword.length < 5) {
+    throw new ApiError(400, "Password must be at least 5 characters long");
+  }
+
   const user = await User.findById(req.user?._id);
   const isCorrect = user.isPasswordCorrect(oldPassword);
 
@@ -247,6 +251,10 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const forgotPassword = asyncHandler(async (req, res) => {
   const { fullName, userName, email, newPassword } = req.body;
+  if (newPassword.length < 5) {
+    throw new ApiError(400, "Password must be at least 5 characters long");
+  }
+
   if (!fullName || !email || !userName || !newPassword) {
     throw new ApiError(400, "All fields are required");
   }
