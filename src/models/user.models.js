@@ -40,13 +40,17 @@ const userSchema = new mongoose.Schema(
         ref: "Video",
       },
     ],
+    refreshToken: {
+      type: String,
+      default:""
+    },
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = bcypt.hash(this.password, 10);
+    this.password = await bcypt.hash(this.password, 10);
   }
   next();
 });
@@ -61,7 +65,7 @@ userSchema.methods.generateAccessToken = function () {
       _id: this._id,
       email: this.email,
       userName: this.userName,
-      fullName:this.fullName,
+      fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
